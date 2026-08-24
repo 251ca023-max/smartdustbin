@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Smart Dustbin Dashboard</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta http-equiv="refresh" content="5">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7f9;
+        }
+
+        .header {
+            background: #1f4e5f;
+            color: white;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 35px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .bin-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .percentage {
+            text-align: center;
+            font-size: 60px;
+            font-weight: bold;
+            margin: 25px 0;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 35px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: #4caf50;
+            transition: width 0.5s;
+        }
+
+        .status {
+            margin: 25px auto;
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .info-box {
+            background: #f4f7f9;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .info-box .label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .info-box .value {
+            margin-top: 8px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .alert {
+            margin-top: 25px;
+            padding: 18px;
+            background: #ffdddd;
+            color: #b30000;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #777;
+        }
+
+        @media (max-width: 600px) {
+
+            .info {
+                grid-template-columns: 1fr;
+            }
+
+            .percentage {
+                font-size: 45px;
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="header">
+
+        <h1>🗑️ SMART DUSTBIN</h1>
+
+        <p>IoT Waste Monitoring System</p>
+
+    </div>
+
+
+    <div class="container">
+
+        <div class="card">
+
+            {% if latest_data %}
+
+            <div class="bin-title">
+
+                Bin {{ latest_data.bin_id }}
+
+            </div>
+
+
+            <div class="percentage">
+
+                {{ latest_data.waste_level }}%
+
+            </div>
+
+
+            <div class="progress-container">
+
+                <div class="progress" style="
+        width: {{ latest_data.waste_level }}%;
+        background:
+        {% if latest_data.waste_level >= 80 %}
+            #e53935
+        {% elif latest_data.waste_level >= 60 %}
+            #ff9800
+        {% elif latest_data.waste_level >= 40 %}
+            #fbc02d
+        {% else %}
+            #4caf50
+        {% endif %};
+    ">
+                </div>
+
+            </div>
+
+
+            <div class="status" style="
+     {% if latest_data.waste_level >= 80 %}
+         background: #ffcdd2;
+         color: #b71c1c;
+     {% elif latest_data.waste_level >= 60 %}
+         background: #ffe0b2;
+         color: #e65100;
+     {% elif latest_data.waste_level >= 40 %}
+         background: #fff9c4;
+         color: #827717;
+     {% else %}
+         background: #c8e6c9;
+         color: #1b5e20;
+     {% endif %}
+     ">
+
+                {{ latest_data.status }}
+
+            </div>
+
+
+            <div class="info">
+
+                <div class="info-box">
+
+                    <div class="label">
+                        DISTANCE
+                    </div>
+
+                    <div class="value">
+
+                        {{ latest_data.distance }} cm
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="label">
+                        WASTE LEVEL
+                    </div>
+
+                    <div class="value">
+
+                        {{ latest_data.waste_level }}%
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="label">
+                        STATUS
+                    </div>
+
+                    <div class="value">
+
+                        {{ latest_data.status }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-box">
+
+                    <div class="label">
+                        LAST UPDATED
+                    </div>
+
+                    <div class="value">
+
+                        {{ latest_data.created_at|date:"h:i A" }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% if latest_data.waste_level >= 80 %}
+
+            <div class="alert">
+
+                🚨 BIN FULL!
+
+                <br>
+
+                Please empty the dustbin.
+
+            </div>
+
+            {% endif %}
+
+
+            <div class="footer">
+
+                Last updated on
+                {{ latest_data.created_at|date:"d M Y, h:i A" }}
+
+            </div>
+
+
+            {% else %}
+
+            <h2>No sensor data available.</h2>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
